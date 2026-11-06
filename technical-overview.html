@@ -1,0 +1,275 @@
+<title>Technical Overview</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: single-column document, utilitarian treatment, data-dense */
+  :root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --surface-alt: #f3f4f6;
+    --fg: #1a1a2e;
+    --fg-muted: #6b7280;
+    --accent: #1e3a5f;
+    --accent-light: #e8eef4;
+    --success: #16a34a;
+    --warn: #d97706;
+    --danger: #dc2626;
+    --border: #e2e5ea;
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1117;
+      --surface: #1a1c25;
+      --surface-alt: #22252f;
+      --fg: #e4e5e9;
+      --fg-muted: #8b8fa3;
+      --accent: #5b9bd5;
+      --accent-light: #1c2a3a;
+      --success: #4ade80;
+      --warn: #fbbf24;
+      --danger: #f87171;
+      --border: #2d303a;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1117;
+    --surface: #1a1c25;
+    --surface-alt: #22252f;
+    --fg: #e4e5e9;
+    --fg-muted: #8b8fa3;
+    --accent: #5b9bd5;
+    --accent-light: #1c2a3a;
+    --success: #4ade80;
+    --warn: #fbbf24;
+    --danger: #f87171;
+    --border: #2d303a;
+    color-scheme: dark;
+  }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 0;
+    max-width: 860px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  h1 { font-size: 1.75rem; font-weight: 700; margin: 2rem 0 0.25rem; letter-spacing: -0.02em; color: var(--accent); }
+  h2 { font-size: 1.15rem; font-weight: 700; margin: 2.25rem 0 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.8rem; color: var(--accent); border-bottom: 2px solid var(--accent); padding-bottom: 0.35rem; }
+  h3 { font-size: 1rem; font-weight: 600; margin: 1.5rem 0 0.5rem; color: var(--fg); }
+  p, li { font-size: 0.9rem; color: var(--fg); }
+  .subtitle { font-size: 1rem; color: var(--fg-muted); margin: 0 0 0.5rem; font-weight: 400; }
+  .meta { font-size: 0.78rem; color: var(--fg-muted); margin-bottom: 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .meta span { white-space: nowrap; }
+  .badge { display: inline-block; font-size: 0.7rem; font-weight: 600; padding: 2px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .badge-green { background: color-mix(in srgb, var(--success) 15%, transparent); color: var(--success); }
+  .badge-yellow { background: color-mix(in srgb, var(--warn) 15%, transparent); color: var(--warn); }
+
+  table { width: 100%; border-collapse: collapse; margin: 0.75rem 0 1.25rem; font-size: 0.82rem; }
+  th { text-align: left; font-weight: 600; padding: 0.5rem 0.75rem; border-bottom: 2px solid var(--border); color: var(--fg-muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; margin: 0.75rem 0; }
+  .card-header { font-weight: 600; font-size: 0.85rem; margin-bottom: 0.5rem; color: var(--accent); }
+
+  code { font-family: var(--font-mono); font-size: 0.8rem; background: var(--surface-alt); padding: 1px 5px; border-radius: 3px; }
+  pre { font-family: var(--font-mono); font-size: 0.78rem; background: var(--surface-alt); border: 1px solid var(--border); border-radius: 6px; padding: 1rem; overflow-x: auto; line-height: 1.5; margin: 0.75rem 0; }
+
+  .flow { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin: 1rem 0; }
+  .flow-step { background: var(--accent-light); color: var(--accent); font-size: 0.78rem; font-weight: 600; padding: 0.4rem 0.75rem; border-radius: 6px; white-space: nowrap; }
+  .flow-arrow { color: var(--fg-muted); font-size: 1rem; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .failure-row { display: flex; gap: 0.75rem; align-items: flex-start; margin-bottom: 0.75rem; }
+  .failure-icon { flex-shrink: 0; width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; color: #fff; }
+  .failure-body { min-width: 0; }
+  .failure-title { font-weight: 600; font-size: 0.85rem; margin-bottom: 0.15rem; }
+  .failure-desc { font-size: 0.8rem; color: var(--fg-muted); }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  ul { padding-left: 1.25rem; margin: 0.4rem 0; }
+  li { margin-bottom: 0.3rem; }
+</style>
+
+<h1>Connected Healthcare Workflow</h1>
+<p class="subtitle">Headless real-time synchronization service for home healthcare systems</p>
+<div class="meta">
+  <span>Challenge 03 / Healthcare Integration</span>
+  <span>Customer: Team Select Home Care</span>
+  <span>Stack: TypeScript, Kafka, PostgreSQL</span>
+</div>
+
+<h2>Problem</h2>
+<p>A home healthcare organization operates across 55 locations. Disconnected applications hold patient and employee information. Manual updates and daily synchronization create delays — a contact-information change in one system may not reach others, and teams act on outdated records.</p>
+
+<h2>Solution Architecture</h2>
+<p>A headless workflow service sits between all source systems. It consumes events in real time, validates them, resolves conflicts deterministically, persists an authoritative record, and emits updates to every connected application.</p>
+
+<div class="flow">
+  <span class="flow-step">Source System</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Kafka Inbound</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Validate</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">CRDT Merge</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Persist + Audit</span>
+  <span class="flow-arrow">&rarr;</span>
+  <span class="flow-step">Emit Downstream</span>
+</div>
+
+<h2>Pipeline Stages</h2>
+<table>
+  <thead><tr><th>Stage</th><th>What it does</th><th>On failure</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>1. Validation</strong></td>
+      <td>Checks field value against stored rules (regex, enum, required) and AI-parsed notes for implicit constraints</td>
+      <td>Field rejected, audit log records reason, UI notified</td>
+    </tr>
+    <tr>
+      <td><strong>2. CRDT Merge</strong></td>
+      <td>Last-Writer-Wins per field — atomic SQL compares timestamps; newer wins, ties go to incumbent</td>
+      <td>Older write rejected as conflict, both values audited</td>
+    </tr>
+    <tr>
+      <td><strong>3. Persist</strong></td>
+      <td>Writes winning value to Postgres; appends immutable audit entry for every attempt (applied or not)</td>
+      <td>Transaction rolls back, event retried via DLQ</td>
+    </tr>
+    <tr>
+      <td><strong>4. Permission Tag</strong></td>
+      <td>Attaches role-based access metadata so downstream systems enforce HIPAA field visibility</td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td><strong>5. Emit</strong></td>
+      <td>Publishes to Kafka outbound topics + Socket.IO for real-time UI updates</td>
+      <td>Failed delivery → Dead Letter Queue with exponential retry</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Key Design Decisions</h2>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="card-header">Conflict Resolution: LWW Register</div>
+    <p style="font-size:0.82rem;margin:0">Each field carries its own timestamp. A single atomic SQL statement resolves conflicts — no application-level locks, no race conditions. Replaying the same event is idempotent.</p>
+    <pre>INSERT INTO field_timestamps ...
+ON CONFLICT DO UPDATE
+WHERE updated_at &lt; EXCLUDED.updated_at</pre>
+  </div>
+  <div class="card">
+    <div class="card-header">Authoritative Record</div>
+    <p style="font-size:0.82rem;margin:0">The <code>field_timestamps</code> table is the source of truth — one row per field per entity, tracking when and by whom it was last written. The CRDT guarantees two systems processing the same events converge to the same state.</p>
+  </div>
+  <div class="card">
+    <div class="card-header">Audit Trail</div>
+    <p style="font-size:0.82rem;margin:0">Append-only <code>audit_log</code> records every field-level change attempt: who, when, from which system, old value, new value, outcome, and reason. Rejections are logged alongside successes.</p>
+  </div>
+  <div class="card">
+    <div class="card-header">HIPAA Safeguards</div>
+    <p style="font-size:0.82rem;margin:0">Events carry access control metadata. The service enforces field visibility server-side per role — Admin sees all, Nurse sees care-relevant fields, Scheduler sees logistics, Read-Only sees names. Patient diagnosis is redacted for non-admin roles.</p>
+  </div>
+</div>
+
+<h2>Failure Handling</h2>
+
+<div class="failure-row">
+  <div class="failure-icon" style="background:var(--danger)">1</div>
+  <div class="failure-body">
+    <div class="failure-title">Bad Data &nbsp;<span class="badge badge-yellow">Rejected at gate</span></div>
+    <div class="failure-desc">Validation catches invalid input before persistence. The field is rejected, the reason is audited, and the source system is notified. Other fields in the same event process independently.</div>
+  </div>
+</div>
+<div class="failure-row">
+  <div class="failure-icon" style="background:var(--warn)">2</div>
+  <div class="failure-body">
+    <div class="failure-title">Concurrent Conflict &nbsp;<span class="badge badge-yellow">LWW resolves</span></div>
+    <div class="failure-desc">Two systems update the same field simultaneously. The CRDT merge picks the newer timestamp atomically. Both values are audited — the winner as "applied," the loser as "conflict_rejected."</div>
+  </div>
+</div>
+<div class="failure-row">
+  <div class="failure-icon" style="background:var(--accent)">3</div>
+  <div class="failure-body">
+    <div class="failure-title">Delivery Failure &nbsp;<span class="badge badge-green">DLQ retries</span></div>
+    <div class="failure-desc">Downstream emit fails (Kafka unreachable, network issue). The event is already persisted and audited. Failed delivery goes to a Dead Letter Queue with exponential retry (30s → 60s → 120s, max 3). Exhausted items alert via Datadog.</div>
+  </div>
+</div>
+<div class="failure-row">
+  <div class="failure-icon" style="background:var(--fg-muted)">4</div>
+  <div class="failure-body">
+    <div class="failure-title">AI Validation Down &nbsp;<span class="badge badge-green">Graceful pass</span></div>
+    <div class="failure-desc">Notes parsing fails or times out. The update is allowed through (explicit rules are the hard gate). The audit log records the skip. No legitimate update is blocked by a secondary system's outage.</div>
+  </div>
+</div>
+<div class="failure-row">
+  <div class="failure-icon" style="background:var(--fg-muted)">5</div>
+  <div class="failure-body">
+    <div class="failure-title">Service Crash &nbsp;<span class="badge badge-green">Kafka replays</span></div>
+    <div class="failure-desc">Events in Kafka are retained. On restart, the consumer resumes from its last committed offset. The CRDT merge is idempotent — reprocessing produces the same result with no duplicates.</div>
+  </div>
+</div>
+
+<h2>Non-Realtime Ingestion</h2>
+<p>Not all source systems can emit events. The service supports two ingestion paths:</p>
+<div class="grid-2">
+  <div class="card">
+    <div class="card-header">Real-Time (Primary)</div>
+    <p style="font-size:0.82rem;margin:0">Source systems POST events via REST or produce directly to Kafka. Propagation is sub-second. This is the path used by systems with webhook or event support.</p>
+  </div>
+  <div class="card">
+    <div class="card-header">Polling Fallback</div>
+    <p style="font-size:0.82rem;margin:0">A configurable poller queries legacy systems on an interval, diffs against the last snapshot, and produces standard events to Kafka. From that point, the pipeline is identical. Latency equals the poll interval — still dramatically better than daily batch sync.</p>
+  </div>
+</div>
+
+<h2>Constraint Coverage</h2>
+<table>
+  <thead><tr><th>Constraint</th><th>How it's addressed</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Synthetic data</strong></td><td>All seed data is fictional (5 clinicians, 1 patient, realistic profiles with notes)</td></tr>
+    <tr><td><strong>Secure handling</strong></td><td>Role-based field filtering enforced server-side on every API response and Socket.IO emission</td></tr>
+    <tr><td><strong>Auditability</strong></td><td>Append-only audit log records every attempt — applied, rejected, or conflicted — with full context</td></tr>
+    <tr><td><strong>Idempotency</strong></td><td>CRDT merge is a single atomic SQL — same event replayed N times produces the same state</td></tr>
+    <tr><td><strong>HIPAA safeguards</strong></td><td>Patient diagnosis, staff exceptions, and notes are redacted for non-admin roles; events carry access metadata</td></tr>
+  </tbody>
+</table>
+
+<h2>Technology Stack</h2>
+<table>
+  <thead><tr><th>Layer</th><th>Technology</th><th>Role</th></tr></thead>
+  <tbody>
+    <tr><td>Service</td><td>TypeScript, Express, Socket.IO</td><td>Headless workflow engine, REST API, real-time emission</td></tr>
+    <tr><td>Event Bus</td><td>Apache Kafka</td><td>Durable message delivery, topic-per-system routing, DLQ</td></tr>
+    <tr><td>Database</td><td>PostgreSQL 16</td><td>Authoritative state, CRDT timestamps, audit log, validation rules</td></tr>
+    <tr><td>Monitoring</td><td>Datadog (StatsD)</td><td>Metrics on throughput, conflicts, validation failures, DLQ depth</td></tr>
+    <tr><td>Demo UIs</td><td>React 18, Vite</td><td>Simulated EHR (5173), HR (5174), Ops Dashboard (5175)</td></tr>
+    <tr><td>Infrastructure</td><td>Docker Compose</td><td>Single-command local deployment of all services</td></tr>
+  </tbody>
+</table>
+
+<h2>Demo Walkthrough</h2>
+<table>
+  <thead><tr><th>#</th><th>Action</th><th>What to observe</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Open HR (5174), EHR (5173), Dashboard (5175)</td><td>Three independent apps, each showing their view of the same data</td></tr>
+    <tr><td>2</td><td>In HR, change Sarah's phone to <code>555-999-8888</code></td><td>EHR clinician card and Dashboard update in real time</td></tr>
+    <tr><td>3</td><td>In EHR, change patient phone to <code>12345</code></td><td>Validation error — event log shows red "Validation Failed"</td></tr>
+    <tr><td>4</td><td>Change phone in HR, then immediately in EHR</td><td>CRDT resolves — newer timestamp wins, loser shows yellow "Conflict"</td></tr>
+    <tr><td>5</td><td>Switch role to Nurse</td><td>Diagnosis field becomes "[REDACTED]" — HIPAA enforcement</td></tr>
+    <tr><td>6</td><td>In HR, click "Report Call Off" → "Confirm"</td><td>Dashboard shows alert; EHR promotes Maria to primary; audit trail captures both events</td></tr>
+  </tbody>
+</table>
+
+<hr>
+<p style="font-size:0.78rem;color:var(--fg-muted);text-align:center;">Connected Healthcare Workflow &mdash; Challenge 03 / Healthcare Integration &mdash; Proof of Concept</p>

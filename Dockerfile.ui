@@ -1,0 +1,33 @@
+FROM node:20-alpine
+
+ARG VITE_CONFIG=vite.config.ehr.ts
+ENV VITE_CONFIG=${VITE_CONFIG}
+
+WORKDIR /app
+
+# Copy shared package
+COPY shared/package.json shared/
+COPY shared/tsconfig.json shared/
+COPY shared/src shared/src
+
+# Copy UI package
+COPY ui/package.json ui/
+COPY ui/tsconfig.json ui/
+COPY ui/vite.config.ehr.ts ui/
+COPY ui/vite.config.hr.ts ui/
+COPY ui/vite.config.dashboard.ts ui/
+COPY ui/index.html ui/
+COPY tsconfig.base.json .
+
+# Install dependencies
+RUN cd shared && npm install
+RUN cd ui && npm install
+
+# Copy UI source
+COPY ui/src ui/src
+
+WORKDIR /app/ui
+
+EXPOSE 5173 5174 5175
+
+CMD npx vite --config ${VITE_CONFIG} --host 0.0.0.0

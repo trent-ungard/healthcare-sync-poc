@@ -1,0 +1,13 @@
+{
+  "name": "healthcare-sync-poc",
+  "private": true,
+  "scripts": {
+    "dev:service": "cd service && npm run dev",
+    "dev:ehr": "cd ui && npm run dev:ehr",
+    "dev:hr": "cd ui && npm run dev:hr",
+    "dev:dashboard": "cd ui && npm run dev:dashboard",
+    "build:shared": "cd shared && npm run build",
+    "build:service": "cd service && npm run build",
+    "build:ui": "cd ui && npm run build"
+  }
+}

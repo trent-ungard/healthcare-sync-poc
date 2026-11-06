@@ -1,0 +1,49 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy shared package
+COPY shared/package.json shared/
+COPY shared/tsconfig.json shared/
+COPY shared/src shared/src
+
+# Copy service package
+COPY service/package.json service/
+COPY service/tsconfig.json service/
+COPY tsconfig.base.json .
+
+# Install dependencies
+RUN cd shared && npm install
+RUN cd service && npm install
+
+# Copy service source
+COPY service/src service/src
+
+WORKDIR /app/service
+
+# Wait-for-it script for Kafka/Postgres readiness
+RUN apk add --no-cache bash
+COPY <<'EOF' /app/wait-for-it.sh
+#!/bin/bash
+set -e
+host="$1"
+port="$2"
+shift 2
+echo "Waiting for $host:$port..."
+for i in $(seq 1 30); do
+  if nc -z "$host" "$port" 2>/dev/null; then
+    echo "$host:$port is available"
+    exec "$@"
+  fi
+  echo "Attempt $i/30: $host:$port not ready, retrying in 2s..."
+  sleep 2
+done
+echo "Timeout waiting for $host:$port"
+exit 1
+EOF
+RUN chmod +x /app/wait-for-it.sh
+RUN apk add --no-cache netcat-openbsd
+
+EXPOSE 3001
+
+CMD ["/app/wait-for-it.sh", "kafka", "29092", "npx", "tsx", "src/index.ts"]
